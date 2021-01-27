@@ -16,17 +16,26 @@ class User {
         }
     }
 
+    async findById(id){
+        try {
+            var result = await knex.select(['id', 'name', 'email', 'role']).where({id}).table('users');
+            return result;
+        } catch(error){
+            return [];
+        }
+    }
+
     async findEmail(email){
         try {
             var result = await knex.select('*').from('users').where({email: email});
 
-            if(result > 0){
-                return {status: true};
+            if(result.length > 0){
+                return true;
             } else {
-                return {status: false};
+                return false;
             }
         } catch(error){
-            return {status: false, error};
+            return false;
         }
     }
 
@@ -36,6 +45,41 @@ class User {
             await knex.insert({name, email, password: hash, role: 0}).table('users');
         } catch(error){
             console.log(error);
+        }
+    }
+
+    async update(id, name, email, role){
+        var user = await this.findById(id);
+
+        if(user != undefined){
+            var editUser = {};
+            if(email != undefined){
+                if(email != user.name){
+                    var result = await this.findEmail(email);
+                    if(result == false){
+                        editUser.email = email;
+                    } else {
+                        return {status: false, error: 'O email ja esta cadastrado!'};
+                    }
+                }
+            }
+
+            if(name != undefined){
+                editUser.name = name;
+            }
+
+            if(role != undefined){
+                editUser.role = role;
+            }
+
+            try {
+                await knex.update(editUser).where({id}).table('users');
+                return {status: true};
+            } catch(error){
+                return {status: false, error};
+            }
+        } else {
+            return {status: false, error: 'O usuario nao existe'};
         }
     }
 }

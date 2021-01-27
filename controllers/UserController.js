@@ -37,6 +37,24 @@ class UserController {
         res.status(200);
         res.send('Cadastrado com sucesso!');
     }
+
+    async edit(req, res){
+        var { id, name, email, role } = req.body;
+
+        if(!isNaN(id)){
+            var result = await User.update(id, name, email, role);
+            if(result.status){
+                res.status(200);
+                res.send('Editado com sucesso!');
+            } else {
+                res.status(406);
+                res.send(result.error);
+            }
+        } else {
+            res.status(400);
+            res.send('Id invalido!');
+        }
+    }
 }
 
 module.exports = new UserController();
