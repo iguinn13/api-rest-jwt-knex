@@ -1,4 +1,4 @@
-const knex = {
+const knex = require('knex')({
     client: 'mysql2',
     connection:{
         host: process.env.DB_HOST,
@@ -6,6 +6,6 @@ const knex = {
         password: process.env.DB_PASSWORD,
         database: process.env.DB_NAME
     }
-}
+});
 
 module.exports = knex;
